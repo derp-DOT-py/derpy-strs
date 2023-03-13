@@ -2,8 +2,12 @@
 
 import sys
 
-B64STRS = [chr(i) for i in range(65,91)]+[chr(i) for i in range(97,123)]+[chr(i) for i in range(48,58)]+["+","/"]
-HEXSTRS = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f']
+DECIMALS = [chr(i) for i in range(48,58)]
+LOWERS = [chr(i) for i in range(97,123)]
+UPPERS = [chr(i) for i in range(65,91)]
+B64STRS = UPPERS + LOWERS + DECIMALS + ["+","/"]
+HEXSTRS = DECIMALS + UPPERS[:6] + LOWERS[:6]
+
 
 def getalnum(string):
     '''extract alphanumerics from a string; (usually) good for generating base64 strings'''
@@ -20,16 +24,30 @@ def getb64(string):
 
 def getdec(string):
     '''extract decimals from a string'''
-    return ''.join([i for i in string if i.isdigit()])
+    return ''.join([i for i in string if i in DECIMALS])
 
 def gethex(string):
     '''extract valid hex digits from a string'''
     return ''.join([i for i in string if i in HEXSTRS]).lower()
 
+def getlowers(string):
+    '''extract lower case letters from a string'''
+    return ''.join([i for i in string if i in LOWERS])
+
+def getuppers(string):
+    '''extract upper case letters from a string'''
+    return ''.join([i for i in string if i in UPPERS])
+
+def rev(string):
+    '''reverse a string'''
+    return string[::-1]
+
+
+
 
 def isb36(string):
     '''true if string is a valid base36 string'''
-    return (all([(i in [chr(j) for j in range(48,58)]+[chr(k) for k in range(65,91)]) for i in string])) or (all([(i in [chr(j) for j in range(48,58)]+[chr(k) for k in range(97,123)]) for i in string]))
+    return (all([(i in DECIMALS + UPPERS) for i in string])) or (all([(i in DECIMALS + LOWERS) for i in string]))
 
 def isb64(string):
     '''true if string is a valid base64 string'''
@@ -43,6 +61,18 @@ def ishex(string):
     '''true if string is a valid hexstring'''
     return all([(i in HEXSTRS) for i in string])
 
+
+
+
+def hxconv(string):
+    '''a hex algorithm'''
+    s = ''.join(getdec(string))
+    hex_str = hex(int(s))[2:]
+    if len(hex_str) == 1:
+        return hex_str
+    if all(char in 'abcdef' for char in hex_str):
+        return hex_str
+    return hex_str + hxconv(hex_str)
 
 
 
